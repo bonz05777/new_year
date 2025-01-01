@@ -28,8 +28,8 @@
         }
         .greeting {
             font-size: 5rem;
-            text-shadow: 0 0 10px #ff0, 0 0 20px #f0f;
-            animation: pulse 2s infinite;
+            text-shadow: 0 0 10px #ff0, 0 0 20px #f0f, 0 0 30px #fff;
+            animation: pulse 2s infinite, bounce 1s infinite;
         }
         .family-message {
             font-size: 2rem;
@@ -41,6 +41,18 @@
             margin-top: 0.5rem;
             color: #ffffff;
         }
+        .snowflake {
+            width: 5px;
+            height: 5px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: snowFall 3s ease-out infinite;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.5);
+        }
         @keyframes pulse {
             0%, 100% {
                 transform: scale(1);
@@ -49,18 +61,80 @@
                 transform: scale(1.1);
             }
         }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        @keyframes snowFall {
+            0% {
+                top: -5px;
+                opacity: 0;
+            }
+            100% {
+                top: 100%;
+                opacity: 1;
+            }
+        }
+        .envelope {
+            width: 300px;
+            height: 200px;
+            background-color: rgb(10, 16, 56);
+            border: 5px solid white;
+            border-radius: 15px;
+            position: relative;
+            margin: 2rem auto;
+            overflow: hidden;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .envelope-content {
+            width: 95%;
+            padding: 1rem;
+            text-align: center;
+            display: none;
+        }
+        .funny-resolution {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            color: rgb(255, 255, 255);
+        }
     </style>
 </head>
 <body>
     <canvas id="fireworks"></canvas>
     <div class="container text-center d-flex flex-column justify-content-center align-items-center vh-100 content">
-        <h1 class="greeting">Happy New Year 2025!</h1>
+        <h1 class="greeting interactive">Happy New Year 2025!</h1>
         <p class="family-message">From Laluna Family</p>
         <p class="short-message">May this year bring you endless joy, health, and success!</p>
+
+        <!-- Snow Effect -->
+        <div id="snowContainer"></div>
+
+        <!-- Envelope -->
+        <div class="envelope" id="envelope">
+            <div class="envelope-content">
+                <h2>Dear <span id="userName"></span>,</h2>
+                <p class="funny-resolution"></p>
+            </div>
+        </div>
+
+        <!-- Name Input Field -->
+        <div class="mb-3">
+            <input type="text" id="userInput" class="form-control" placeholder="Enter your name">
+        </div>
+
+        <!-- Open Envelope Button -->
+        <button class="btn btn-primary mt-3" onclick="openEnvelope()">Open Envelope</button>
+
     </div>
 
     <script>
-        // Fireworks effect
         const canvas = document.getElementById('fireworks');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -94,11 +168,11 @@
         let fireworks = [];
         function createFirework() {
             const colors = ["255, 0, 0", "0, 255, 0", "0, 0, 255", "255, 255, 0", "255, 0, 255", "0, 255, 255"];
-            for (let j = 0; j < 3; j++) { // Create three fireworks simultaneously
+            for (let j = 0; j < 3; j++) {
                 const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height / 2; // Fireworks originate in the upper half
+                const y = Math.random() * canvas.height / 2;
                 const color = colors[Math.floor(Math.random() * colors.length)];
-                for (let i = 0; i < 50; i++) { // Increase the number of particles for larger explosions
+                for (let i = 0; i < 50; i++) {
                     fireworks.push(new Firework(x, y, color));
                 }
             }
@@ -121,7 +195,53 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
-    </script>
+
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            snowflake.style.left = `${Math.random() * window.innerWidth}px`;
+            document.getElementById('snowContainer').appendChild(snowflake);
+            setTimeout(() => snowflake.remove(), 3000);
+        }
+
+        // Continuous snowflake generation
+        setInterval(createSnowflake, 50);
+
+        function openEnvelope() {
+            const content = document.querySelector('.envelope-content');
+            const userName = document.getElementById('userInput').value;
+
+            if (userName.trim() === '') {
+                content.style.display = 'none';  // Hide the envelope if no name is entered
+                return;
+            }
+
+            content.style.display = 'block';
+            document.getElementById('userName').innerText = userName;
+
+            const funnyMessages = [
+                "Sleep early and wake up early",
+                "Travel more, worry less",
+                "Learn a new skill🌟",
+                "Smile more often😊",
+                "Mag-ipon ng pera! Pero ‘yung ipon ba, hanggang January lang?",
+                "Mag-exercise, para matapos ang taon na may 1-star review sa fitness journey🏋️‍♂️⭐",
+                "Mag-reserve ng vacation para sa 2026, not now, wala kapang ipon eh🏖️⏳",
+                "Mag-learn magluto ng bagong ulam, pero mukhang mas madali pa rin mag-order online.",
+                "Mag-save para sa emergency fund, kaso ang emergency ay kapag may sale sa Shopee.",
+                "Mag-switch ng skincare routine. Pero ang effective pa rin ay pagtulog ng 12AM",
+                "Grow personally by building discipline and resilience💪",
+                "Enhance productivity by managing time effectively, setting goals, and prioritizing tasks📈",
+                "Resolutions are fun, but secretly hoping mine is sitting right in front of me 🤷‍♂️😂",
+                "I will be less lazy. Starting tomorrow, I promise, not today,but tomorrow 🤷‍♂️😂",
+                "Making a list of resolutions? Maybe I should add you to it 😏❤️",
+                
+            ];
+            content.querySelector('.funny-resolution').innerText = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+        }
+
+
+            </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
